@@ -1,2 +1,2 @@
-# flask_api
+# Flask API
 Flask bicycles API
