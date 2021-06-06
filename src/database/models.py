@@ -36,3 +36,14 @@ class Bike(db.Model):
             "price": self.price,
             "rating": self.rating,
         }
+
+
+class Rider(db.Model):
+    __tablename__ = "riders"
+
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"Rider - {self.first_name} {self.last_name}"
