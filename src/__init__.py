@@ -16,4 +16,5 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 api = Api(app)
 
-from . import routes, models
+from . import routes
+from .database import models
