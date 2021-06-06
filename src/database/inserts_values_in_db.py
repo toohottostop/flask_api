@@ -1,7 +1,8 @@
 from datetime import date
 
 from src import db
-from src.models import Bike
+from src.database.models import Bike
+from src.database.models import Rider
 
 
 def insert_bikes():
@@ -60,11 +61,23 @@ def insert_bikes():
         rating=4.95,
     )
 
+    kirill_benderoni = Rider(first_name="Kirill", last_name="Benderoni")
+    danny_macaskill = Rider(first_name="Danny", last_name="Macaskill")
+    fabio_wibmer = Rider(first_name="Fabio", last_name="Wibmer")
+    pavel_alexin = Rider(first_name="Pavel", last_name="Alexin")
+    ivan_kunaev = Rider(first_name="Ivan", last_name="Kunaev")
+
     db.session.add(nukeproof_reactor)
     db.session.add(commencal_absolut)
     db.session.add(commencal_clash)
     db.session.add(gt_force)
     db.session.add(specialized_demo)
+
+    db.session.add(kirill_benderoni)
+    db.session.add(danny_macaskill)
+    db.session.add(fabio_wibmer)
+    db.session.add(pavel_alexin)
+    db.session.add(ivan_kunaev)
 
     db.session.commit()
     db.session.close()
