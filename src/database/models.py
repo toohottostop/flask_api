@@ -1,6 +1,12 @@
 import uuid
 from src import db
 
+bike_riders = db.Table(
+    "bike_riders",
+    db.Column("rider_id", db.Integer, db.ForeignKey("riders.id"), primary_key=True),
+    db.Column("bike_id", db.Integer, db.ForeignKey("bikes.id"), primary_key=True)
+)
+
 
 class Bike(db.Model):
     __tablename__ = "bikes"
@@ -13,8 +19,9 @@ class Bike(db.Model):
     release_date = db.Column(db.Date, index=True, nullable=False)
     price = db.Column(db.Float)
     rating = db.Column(db.Float)
+    riders = db.relationship("Rider", secondary=bike_riders, lazy="subquery", backref=db.backref("bikes", lazy=True))
 
-    def __init__(self, model, riding_style, description, release_date, price, rating):
+    def __init__(self, model, riding_style, description, release_date, price, rating, riders=None):
         self.model = model
         self.uuid = str(uuid.uuid4())
         self.riding_style = riding_style
@@ -22,20 +29,13 @@ class Bike(db.Model):
         self.release_date = release_date
         self.price = price
         self.rating = rating
+        if not riders:
+            self.riders = []
+        else:
+            self.riders = riders
 
     def __repr__(self):
         return f"Bike({self.model}, {self.uuid}, {self.release_date}, {self.price})"
-
-    def to_dict(self):
-        return {
-            "model": self.model,
-            "uuid": self.uuid,
-            "riding_style": self.riding_style,
-            "description": self.description,
-            "release_date": self.release_date.strftime("%Y-%m-%d"),
-            "price": self.price,
-            "rating": self.rating,
-        }
 
 
 class Rider(db.Model):
