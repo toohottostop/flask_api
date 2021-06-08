@@ -67,6 +67,12 @@ def insert_bikes():
     pavel_alexin = Rider(first_name="Pavel", last_name="Alexin")
     ivan_kunaev = Rider(first_name="Ivan", last_name="Kunaev")
 
+    nukeproof_reactor.riders = [danny_macaskill, fabio_wibmer]
+    commencal_absolut.riders = [danny_macaskill, fabio_wibmer, pavel_alexin]
+    commencal_clash.riders = [fabio_wibmer]
+    gt_force.riders = [ivan_kunaev]
+    specialized_demo.riders = [pavel_alexin, kirill_benderoni]
+
     db.session.add(nukeproof_reactor)
     db.session.add(commencal_absolut)
     db.session.add(commencal_clash)
