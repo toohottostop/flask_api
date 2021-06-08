@@ -63,6 +63,7 @@ db.sqlite3-journal
 
 # Flask stuff:
 instance/
+data/
 .webassets-cache
 
 # Scrapy stuff:
@@ -104,6 +105,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
+api_venv
 env/
 venv/
 ENV/
@@ -127,3 +129,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Self-test modules
+probe.py
