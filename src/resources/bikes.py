@@ -4,11 +4,13 @@ from src.schemas.bikes import BikeSchema
 from src import db
 from src.database.models import Bike
 from marshmallow import ValidationError
+from .auth import token_required
 
 
 class BikesListApi(Resource):
     bike_schema = BikeSchema()
 
+    @token_required
     def get(self, uuid=None):
         if not uuid:
             bikes = db.session.query(Bike).all()
