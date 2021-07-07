@@ -31,11 +31,11 @@ Activate virtual environment
 `$source <name_of_virtualenv>/bin/activate`
 4. Install requirements  
 `pip install -r requirements.txt`
-5. Make directory for your sqlite database
-`$mkdir data`
-Apply migrations
-`flask db upgrade`
-*You can populate your db with script `inserts_values_in_db.py` from folder "/src/database/"
+5. Make directory for your sqlite database  
+`$mkdir data`  
+Apply migrations  
+`flask db upgrade`  
+<i>*You can populate your db with script `inserts_values_in_db.py` from folder "/src/database/"</i>
    
 ## How to use  
 `$python3 wsgi.py`
