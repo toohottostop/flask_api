@@ -4,15 +4,42 @@ import json
 import jwt
 import datetime
 import pytest
-from unittest.mock import patch
 
 from src import app, db
 from src.database.models import User, Bike
-from src.resources.bikes import BikesListApi
 
 
 class TestBikesResource:
-    uuid = []
+    URL = '/bikes/'
+    CLIENT = app.test_client()
+    UUID = []
+    DATA_FOR_POST = {
+        'model': 'Test Model',
+        'riding_style': 'Test Style',
+        'description': 'Some description',
+        'release_date': '2021-01-01',
+        'price': 100000.0,
+        'rating': 5.0
+    }
+    DATA_FOR_PUT = {
+        'model': 'Update Test Model',
+        'riding_style': 'Update Test Style',
+        'description': 'Update Some description',
+        'release_date': '2021-01-02',
+        'price': 200000.0,
+        'rating': 4.95
+    }
+    DATA_FOR_PATCH = {
+        'model': 'Patch Test Model',
+        'riding_style': 'Patch Test Style',
+        'release_date': '2021-03-03',
+    }
+    VALIDATION_ERROR_DATA = {
+        'riding_style': 'Test Style',
+        'description': 'Some description',
+        'price': 100000.0,
+        'rating': 5.0
+    }
 
     @pytest.fixture(name='token_and_bike_uuid')
     def set_test_user_and_create_token(self):
@@ -39,8 +66,9 @@ class TestBikesResource:
 
     def test_get_bikes_list(self, token_and_bike_uuid):
         token = token_and_bike_uuid[0]
-        client = app.test_client()
-        response_bikes = client.get('/bikes', headers={"X-API-KEY": token})
+
+        headers = {"X-API-KEY": token}
+        response_bikes = self.CLIENT.get(self.URL, headers=headers)
 
         assert response_bikes.status_code == http.HTTPStatus.OK
         assert response_bikes.headers['Content-Type'] == 'application/json'
@@ -48,54 +76,55 @@ class TestBikesResource:
 
     def test_get_one_bike(self, token_and_bike_uuid):
         token, uuid = token_and_bike_uuid[0], token_and_bike_uuid[1]
-        client = app.test_client()
-        response_bike = client.get(f'/bikes/{uuid}', headers={"X-API-KEY": token})
+        headers = {"X-API-KEY": token}
+        response_bike = self.CLIENT.get(self.URL + uuid, headers=headers)
 
         assert response_bike.status_code == http.HTTPStatus.OK
 
+    def test_non_exist_bike(self, token_and_bike_uuid):
+        token = token_and_bike_uuid[0]
+        headers = {"X-API-KEY": token}
+        bad_uuid = '666'
+        response_bike = self.CLIENT.get(self.URL + bad_uuid, headers=headers)
+        assert response_bike.status_code == http.HTTPStatus.NOT_FOUND
+
     def test_create_bike(self):
-        client = app.test_client()
-        data = {
-            'model': 'Test Model',
-            'riding_style': 'Test Style',
-            'description': 'Some description',
-            'release_date': '2021-01-01',
-            'price': 100000.0,
-            'rating': 5.0
-        }
-        response = client.post('/bikes', data=json.dumps(data), content_type='application/json')
+        response = self.CLIENT.post(self.URL, data=json.dumps(self.DATA_FOR_POST), content_type='application/json')
+
         assert response.status_code == http.HTTPStatus.CREATED
         assert response.json['model'] == 'Test Model'
-        self.uuid.append(response.json['uuid'])
+        self.UUID.append(response.json['uuid'])
+
+    def test_validation(self):
+        response = self.CLIENT.post(self.URL,
+                                    data=json.dumps(self.VALIDATION_ERROR_DATA),
+                                    content_type='application/json'
+                                    )
+
+        assert response.status_code == http.HTTPStatus.BAD_REQUEST
+        assert b'Missing data for required field.' in response.data
 
     def test_update_bike(self):
-        client = app.test_client()
-        data = {
-            'model': 'Update Test Model',
-            'riding_style': 'Update Test Style',
-            'description': 'Update Some description',
-            'release_date': '2021-01-02',
-            'price': 200000.0,
-            'rating': 4.95
-        }
-        response = client.put(f'/bikes/{self.uuid[0]}', data=json.dumps(data), content_type='application/json')
+        response = self.CLIENT.put(
+            self.URL + self.UUID[0],
+            data=json.dumps(self.DATA_FOR_PUT),
+            content_type='application/json'
+        )
+
         assert response.status_code == http.HTTPStatus.OK
         assert response.json['model'] == 'Update Test Model'
 
     def test_patch_bike(self):
-        client = app.test_client()
-        url = f'/bikes/{self.uuid[0]}'
-        data = {
-            'model': 'Patch Test Model',
-            'riding_style': 'Patch Test Style',
-            'release_date': '2021-03-03',
-        }
-        response = client.patch(url, data=json.dumps(data), content_type='application/json')
+        response = self.CLIENT.patch(
+            self.URL + self.UUID[0],
+            data=json.dumps(self.DATA_FOR_PATCH),
+            content_type='application/json'
+        )
+
         assert response.status_code == http.HTTPStatus.OK
         assert response.json['model'] == 'Patch Test Model'
 
     def test_delete_bike(self):
-        client = app.test_client()
-        url = f'/bikes/{self.uuid[0]}'
-        response = client.delete(url)
+        response = self.CLIENT.delete(self.URL + self.UUID[0])
+
         assert response.status_code == http.HTTPStatus.NO_CONTENT
