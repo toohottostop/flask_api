@@ -20,7 +20,7 @@ class AuthRegister(Resource):
         try:
             user = self.user_schema.load(request.json, session=db.session)
         except ValidationError as exc:
-            return {"message": str(exc)}
+            return {"message": str(exc)}, 400
         try:
             db.session.add(user)
             db.session.commit()
